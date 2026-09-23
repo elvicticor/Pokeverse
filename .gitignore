@@ -1,0 +1,23 @@
+# Dependencias y build
+node_modules/
+dist/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Logs y cachés
+*.log
+npm-debug.log*
+.vite/
+*.tsbuildinfo
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Nota: public/cards.json SÍ se versiona (lo usa /mercado y lo actualiza el workflow diario)

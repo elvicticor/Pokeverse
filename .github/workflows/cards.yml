@@ -1,0 +1,31 @@
+# Regenera public/cards.json (precios de todas las cartas TCG) una vez al día.
+# Solo se activa cuando el proyecto está en un repositorio de GitHub.
+name: Actualizar precios de cartas
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 06:00 UTC, después de la actualización diaria de precios de TCGdex
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run cards
+      - name: Guardar cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git add public/cards.json
+          git diff --cached --quiet || git commit -m "chore: actualizar precios de cartas"
+          git push
