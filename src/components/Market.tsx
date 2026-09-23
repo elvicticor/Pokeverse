@@ -16,7 +16,7 @@ const priceIn = (c:CardSnapshot, currency:Currency) => currency==='EUR'?c.eur:c.
 const reliable = (c:CardSnapshot) => c.eur!=null && c.usd!=null
 
 async function getSnapshot():Promise<CardsFile> {
-  const r = await fetch('/cards.json')
+  const r = await fetch(`${import.meta.env.BASE_URL}cards.json`) // BASE_URL: '/' en local, '/Pokeverse/' en GitHub Pages
   if (!r.ok) throw new Error(`HTTP ${r.status}`)
   return r.json()
 }

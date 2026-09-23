@@ -1,5 +1,7 @@
 # PokéVerse
 
+**🌐 Ver en vivo: https://elvicticor.github.io/Pokeverse/**
+
 Pokédex web en español que muestra los 1302 Pokémon (1025 especies y sus formas Mega, Gmax y regionales) con su ficha completa y línea evolutiva. Incluye un mercado con los precios de unas 22.000 cartas del juego de cartas coleccionables (TCG).
 
 ![Portada de PokéVerse](docs/pokedex.jpg)
@@ -84,7 +86,13 @@ Las decisiones técnicas y los detalles de funcionamiento están documentados en
 
 ## Despliegue
 
-Es una SPA con rutas del lado del cliente (`/mercado`, `/pokemon/pikachu`). Para que esas rutas no den 404 al recargar la página, el hosting debe redirigir todas las rutas a `index.html`. En Vercel y Netlify basta con una regla de *SPA fallback*.
+La app se publica en **GitHub Pages** mediante el workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml), que se ejecuta con cada `push` a `main` y después de cada actualización diaria de precios.
+
+- Hay que activarlo una vez en **Settings → Pages → Source: GitHub Actions**.
+- El build usa `BASE_PATH=/Pokeverse/`, porque Pages publica la app en una subcarpeta. En local no hace falta.
+- `404.html` es una copia de `index.html`, para que rutas como `/Pokeverse/mercado` carguen bien al recargar la página.
+
+Para publicar en otro hosting (Vercel, Netlify…), compila sin `BASE_PATH` y configura una regla de *SPA fallback* hacia `index.html`.
 
 ## Aviso legal
 

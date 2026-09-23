@@ -191,9 +191,14 @@ La mayor parte del movimiento utiliza `transform` y `opacity`. Si el usuario act
 
 ## Despliegue
 
-La aplicación utiliza `BrowserRouter`. El hosting debe redirigir rutas como `/pokemon/pikachu` a `index.html`. Vercel, Netlify y servidores equivalentes pueden configurarse con una regla de fallback de SPA.
+Publicada en **GitHub Pages**: https://elvicticor.github.io/Pokeverse/ (repo: https://github.com/elvicticor/Pokeverse).
 
-Para una publicación estrictamente estática sin reglas del servidor se puede sustituir `BrowserRouter` por `HashRouter` en `src/main.tsx`.
+- `.github/workflows/pages.yml` compila y publica con cada push a `main`. También lo hace con `workflow_run` al terminar "Actualizar precios de cartas", porque los commits hechos con `GITHUB_TOKEN` no disparan `push`, y sin eso el mercado no mostraría los precios nuevos. Se puede lanzar a mano (`workflow_dispatch`).
+- **Subcarpeta:** Pages sirve la app en `/Pokeverse/`. `vite.config.ts` toma `base` de la variable `BASE_PATH` (por defecto `/`), `BrowserRouter` usa `basename={import.meta.env.BASE_URL}` y el mercado pide `${import.meta.env.BASE_URL}cards.json`.
+- Reglas para que la app siga funcionando en la subcarpeta: nada de `href="/..."` ni `fetch('/...')` con rutas absolutas. Hay que usar `<Link>` o `navigate()` del router, y `import.meta.env.BASE_URL` para los archivos de `public/`.
+- **Rutas al recargar:** el workflow copia `dist/index.html` a `dist/404.html`. Pages lo sirve en cualquier ruta desconocida (con estado 404) y React Router muestra la página correcta.
+- **Probar en local como en Pages:** `MSYS_NO_PATHCONV=1 BASE_PATH=/Pokeverse/ npm run build`. En Git Bash de Windows, `MSYS_NO_PATHCONV=1` es obligatorio: sin él, `/Pokeverse/` se convierte en `C:/Program Files/Git/Pokeverse/` y la app queda en blanco.
+- Otro hosting (Vercel, Netlify): compilar sin `BASE_PATH` y configurar un fallback de SPA hacia `index.html`.
 
 ## Detalles técnicos a recordar
 

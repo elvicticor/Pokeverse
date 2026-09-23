@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getAllPokemon, getTypeIds } from './api'
 import { GENS, MAX_SPECIES, TYPES } from './data'
@@ -31,7 +31,7 @@ export default function App(){
   const open=(key:string|number)=>navigate(`/pokemon/${key}`,{state:inMarket?{from:'/mercado'}:undefined})
   return <div className="app-shell">
     <div className="ambient ambient-one"/><div className="ambient ambient-two"/>
-    <nav className="navbar"><a className="brand" href="/" onClick={e=>{e.preventDefault();navigate('/')}}><span className="brand-mark"><i/></span><b>PokéVerse</b></a><span className="nav-label">Pokédex nacional</span><div className="nav-links"><a href="/" className={inMarket?'':'active'} onClick={e=>{e.preventDefault();navigate('/')}}>Pokédex</a><a href="/mercado" className={inMarket?'active':''} onClick={e=>{e.preventDefault();navigate('/mercado')}}>Mercado</a></div><button className="nav-random" onClick={()=>open(1+Math.floor(Math.random()*MAX_SPECIES))}>Descubrir uno <span>↗</span></button></nav>
+    <nav className="navbar"><Link className="brand" to="/"><span className="brand-mark"><i/></span><b>PokéVerse</b></Link><span className="nav-label">Pokédex nacional</span><div className="nav-links"><Link to="/" className={inMarket?'':'active'}>Pokédex</Link><Link to="/mercado" className={inMarket?'active':''}>Mercado</Link></div><button className="nav-random" onClick={()=>open(1+Math.floor(Math.random()*MAX_SPECIES))}>Descubrir uno <span>↗</span></button></nav>
     {inMarket?<Market onOpenPokemon={open}/>:<>
     <header className="hero"><div className="hero-copy"><motion.span className="overline" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}}>Explora · descubre · colecciona</motion.span><motion.h1 initial={{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{delay:.06}}>Todo el mundo Pokémon,<br/><em>en un solo lugar.</em></motion.h1><motion.p initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{delay:.12}}>Una Pokédex interactiva para conocer especies, estadísticas, evoluciones y cartas de cada generación.</motion.p></div><div className="hero-stat"><strong>{(items.length||MAX_SPECIES).toLocaleString('es')}</strong><span>Pokémon<br/>y formas</span></div></header>
     <main className="content"><SearchFilters items={items} query={query} setQuery={setQuery} gen={gen} setGen={setGen} type={type} setType={setType} forms={forms} setForms={setForms} special={special} setSpecial={setSpecial} onOpen={open}/><div className="results-head"><div><span>Archivo PokéVerse</span><h2>{title}</h2></div><p>{filtered.length.toLocaleString('es')} resultados</p></div>
@@ -39,7 +39,7 @@ export default function App(){
       {!loading&&!error&&!filtered.length&&<div className="empty-state"><span>?</span><h2>No encontramos coincidencias</h2><p>Prueba otro nombre, número o combinación de filtros.</p></div>}
     </main>
     </>}
-    <footer><a className="brand" href="/"><span className="brand-mark"><i/></span><b>PokéVerse</b></a><p>Datos de PokéAPI y TCGdex · Pokémon © Nintendo / Game Freak</p></footer>
+    <footer><Link className="brand" to="/"><span className="brand-mark"><i/></span><b>PokéVerse</b></Link><p>Datos de PokéAPI y TCGdex · Pokémon © Nintendo / Game Freak</p></footer>
     <AnimatePresence>{match&&<PokemonDetail key={match[1]} pokemonKey={decodeURIComponent(match[1])} onClose={()=>navigate(from==='/mercado'?'/mercado':'/')} onOpen={open}/>}</AnimatePresence>
   </div>
 }
