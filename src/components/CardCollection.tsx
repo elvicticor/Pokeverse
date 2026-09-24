@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react'
 import { useQuery } from '@tanstack/react-query'
 import { getCard, getCards, getCardsWithPrices } from '../api'
@@ -38,13 +38,21 @@ export default function CardCollection({id,onView}:{id:number;onView:(c:TcgCard)
       {!priced&&!full.isError&&<div className="price-progress"><span>Cargando precios… {progress[0]}/{progress[1]}</span><i><em style={{width:`${progress[1]?progress[0]/progress[1]*100:0}%`}}/></i></div>}
       {full.isError&&<p className="muted">No se pudieron cargar los precios; se muestran las cartas sin filtrar.</p>}
       <p className="muted cards-count">{visible.length} de {cards.length} cartas · precios de {MARKETS[currency]}</p>
-      <div className="cards">{visible.slice(0,limit).map(({c,price})=><motion.button key={c.id} whileHover={{y:-8,rotate:1}} onClick={()=>onView(c)}>
+      <div className="cards">{visible.slice(0,limit).map(({c,price})=><motion.button key={c.id} whileHover={{y:-8,rotate:1}} whileTap={{scale:.96}} onClick={()=>onView(c)}>
         <img src={`${c.image}/low.webp`} alt={c.name} loading="lazy"/>
         <div className="card-meta"><span>{c.name}</span>{priced&&<b className={price==null?'no-price':''}>{formatPrice(price,currency)}</b>}</div>
       </motion.button>)}</div>
       {limit<visible.length&&<button className="load-more" onClick={()=>setLimit(x=>x+12)}>Ver más cartas ({visible.length-limit})</button>}
     </>}
   </section>
+}
+
+// iOS exige pedir permiso para el giroscopio dentro de un gesto (el primer toque sobre la carta). En Android no hace falta.
+let motionAsked=false
+function requestMotionPermission(){
+  const DOE=(globalThis as {DeviceOrientationEvent?:{requestPermission?:()=>Promise<string>}}).DeviceOrientationEvent
+  if(motionAsked||typeof DOE?.requestPermission!=='function')return
+  motionAsked=true;DOE.requestPermission().catch(()=>{})
 }
 
 // Visor grande con el desglose de precios por mercado y variante.
@@ -56,24 +64,49 @@ export function CardViewer({card,onClose}:{card:TcgCard;onClose:()=>void}) {
   const rotateY=useSpring(useTransform(pointerX,[0,1],[-14,14]),{stiffness:180,damping:22,mass:.55})
   const cm=data.pricing?.cardmarket,variants=tcgplayerVariants(data)
   const cmRows:[string,number|undefined][]=[['Tendencia',cm?.trend],['Promedio',cm?.avg],['Mínimo',cm?.low],['Media 30 días',cm?.avg30],['Tendencia holo',cm?.['trend-holo']],['Promedio holo',cm?.['avg-holo']]]
-  const move=(event:React.PointerEvent<HTMLDivElement>)=>{
-    if(reduced||event.pointerType==='touch')return
-    const rect=event.currentTarget.getBoundingClientRect()
-    const x=(event.clientX-rect.left)/rect.width,y=(event.clientY-rect.top)/rect.height
+  const tilt=useRef<HTMLDivElement>(null),dragging=useRef(false)
+  const [touching,setTouching]=useState(false)
+  const coarse=useMemo(()=>matchMedia('(pointer: coarse)').matches,[])
+  // x, y en 0..1 (0,5 = centro): mueve la inclinación y el brillo holográfico
+  const aim=(x:number,y:number)=>{
+    x=Math.min(1,Math.max(0,x));y=Math.min(1,Math.max(0,y))
     pointerX.set(x);pointerY.set(y)
-    event.currentTarget.style.setProperty('--holo-x',`${x*100}%`)
-    event.currentTarget.style.setProperty('--holo-y',`${y*100}%`)
+    tilt.current?.style.setProperty('--holo-x',`${x*100}%`)
+    tilt.current?.style.setProperty('--holo-y',`${y*100}%`)
   }
-  const reset=()=>{pointerX.set(.5);pointerY.set(.5)}
+  const reset=()=>aim(.5,.5)
+  const fromEvent=(event:React.PointerEvent<HTMLDivElement>)=>{const rect=event.currentTarget.getBoundingClientRect();aim((event.clientX-rect.left)/rect.width,(event.clientY-rect.top)/rect.height)}
+  // Ratón: sigue el cursor. Táctil: se arrastra con el dedo (touch-action:none evita que la página se desplace) y al soltar vuelve al centro.
+  const move=(event:React.PointerEvent<HTMLDivElement>)=>{if(reduced)return;if(event.pointerType!=='touch'||dragging.current)fromEvent(event)}
+  const down=(event:React.PointerEvent<HTMLDivElement>)=>{
+    if(reduced||event.pointerType==='mouse')return
+    dragging.current=true;setTouching(true);event.currentTarget.setPointerCapture(event.pointerId);fromEvent(event)
+    requestMotionPermission()
+  }
+  const up=(event:React.PointerEvent<HTMLDivElement>)=>{if(event.pointerType==='mouse')return;dragging.current=false;setTouching(false);reset()}
+  // Bloquea el scroll del fondo mientras el visor está abierto (clase propia: la ficha usa 'locked' y no debe liberarse al cerrar el visor).
+  useEffect(()=>{document.body.classList.add('viewer-open');return()=>document.body.classList.remove('viewer-open')},[])
+  // Giroscopio: en el celular la carta también se inclina al mover el teléfono (si no se está arrastrando).
+  useEffect(()=>{
+    if(reduced||!coarse)return
+    let base:number|null=null
+    const orient=(e:DeviceOrientationEvent)=>{
+      if(dragging.current||e.beta==null||e.gamma==null)return
+      base??=e.beta
+      aim(.5+e.gamma/60,.5+(e.beta-base)/60)
+    }
+    addEventListener('deviceorientation',orient)
+    return()=>removeEventListener('deviceorientation',orient)
+  },[reduced,coarse])
   return <motion.div className="card-viewer" onClick={onClose} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:.25}}>
     <motion.div className="viewer-body" onClick={e=>e.stopPropagation()} initial={reduced?false:{scale:.72,y:70,rotateZ:-6,opacity:0}} animate={{scale:1,y:0,rotateZ:0,opacity:1}} exit={{scale:.84,y:35,opacity:0}} transition={{type:'spring',stiffness:210,damping:20,mass:.8}}>
       <div className="viewer-card-stage">
-        <motion.div className="viewer-card-tilt" style={reduced?undefined:{rotateX,rotateY}} onPointerMove={move} onPointerLeave={reset}>
+        <motion.div ref={tilt} className={`viewer-card-tilt${touching?' touching':''}`} style={reduced?undefined:{rotateX,rotateY}} onPointerMove={move} onPointerLeave={e=>e.pointerType==='mouse'&&reset()} onPointerDown={down} onPointerUp={up} onPointerCancel={up}>
           <img src={`${data.image}/high.webp`} alt={data.name}/>
           <span className="viewer-holo" aria-hidden="true"/>
           <span className="viewer-glare" aria-hidden="true"/>
         </motion.div>
-        <p>Mueve el mouse sobre la carta</p>
+        <p>{coarse?'Desliza el dedo sobre la carta o inclina el teléfono':'Mueve el mouse sobre la carta'}</p>
       </div>
       <aside className="viewer-info">
         <span className="eyebrow">{data.set?.name??'Carta TCG'}{data.localId?` · #${data.localId}`:''}</span>

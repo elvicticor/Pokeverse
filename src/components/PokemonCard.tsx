@@ -30,7 +30,7 @@ export default function PokemonCard({pokemon,onOpen,index,featured=false,query='
   return <motion.button className={`pokemon-card${featured?' featured':''}`}
     style={{'--card-accent':color,'--card-accent-2':secondColor,...(!reduced?{rotateX,rotateY,transformPerspective:900}:{})} as React.CSSProperties}
     onClick={onOpen} initial={reduced?false:{opacity:0,y:18}} animate={{opacity:1,y:0}}
-    transition={{duration:.4,delay:Math.min(index,10)*.025}} whileHover={reduced?undefined:{y:-7}}
+    transition={{duration:.4,delay:Math.min(index,10)*.025}} whileHover={reduced?undefined:{y:-7}} whileTap={reduced?undefined:{scale:.97}}
     onPointerMove={move} onPointerLeave={reset}>
     <span className="card-pokeball" aria-hidden="true"/><span className="card-shine" aria-hidden="true"/>
     <span className="card-dex" aria-hidden="true">{String(pokemon.id).padStart(3,'0')}</span>
