@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getCard, getCards, getCardsWithPrices } from '../api'
 import { MARKETS, PRICE_RANGES, TCGPLAYER_VARIANTS, formatPrice, priceOf, tcgplayerVariants, type Currency, type PriceSort } from '../pricing'
 import type { TcgCard } from '../types'
+import DeckRecommendations from './DeckRecommendations'
 
 const SIX_HOURS = 6 * 60 * 60 * 1000
 const symbol = (c:Currency) => c==='EUR'?'€':'$'
@@ -117,6 +118,7 @@ export function CardViewer({card,onClose}:{card:TcgCard;onClose:()=>void}) {
           {variants.length>0&&<div className="price-table"><h3>$ TCGPlayer</h3>{variants.map(([k,v])=><p key={k}><span>{TCGPLAYER_VARIANTS[k]??k}</span><b>{formatPrice(v.marketPrice??v.midPrice,'USD')}</b></p>)}</div>}
           {!cm&&!variants.length&&<p className="muted">Sin precios registrados para esta carta.</p>}
         </>}
+        <DeckRecommendations key={card.id} cardId={card.id} cardName={data.name}/>
         <button className="load-more" onClick={onClose}>Cerrar</button>
       </aside>
     </motion.div>

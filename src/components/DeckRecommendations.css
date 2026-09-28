@@ -1,0 +1,29 @@
+.deck-recommendations{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.deck-recommendations h3{font-size:20px;margin:8px 0 12px}
+.deck-recommendations p,.deck-recommendations li{font-size:13px;line-height:1.6}
+.deck-empty,.deck-caption,.deck-source{color:var(--muted)}
+.deck-notice{background:#e9b44a12;border:1px solid #e9b44a40;border-radius:10px;padding:12px;color:#e8cd90}
+.deck-related{background:#6b9cff12;border:1px solid #6b9cff3d;border-radius:9px;padding:10px;color:#adc7ff}
+.deck-panel{border:1px solid var(--line);border-radius:12px;margin-top:12px;padding:14px;background:#ffffff03}
+.deck-panel summary{cursor:pointer;line-height:1.5;font-size:13px}
+.deck-panel summary strong{font-size:15px}
+.deck-panel summary>span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.deck-panel h4{margin:20px 0 8px;font-size:14px}
+.deck-panel h5{margin:14px 0 8px;color:#bbc5d6}
+.deck-panel ol{padding-left:19px}.deck-panel ol li+li{margin-top:10px}
+.deck-source a{color:#8ab8ff;text-underline-offset:3px}
+.deck-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:14px 11px}
+.deck-card{min-width:0}.deck-card-art{position:relative;aspect-ratio:.716;border-radius:7px;overflow:hidden;background:#090c12;border:1px solid #ffffff12}
+.deck-card-art img{display:block;width:100%;height:100%;object-fit:cover;max-width:none!important;margin:0!important}
+.deck-card-art>b{position:absolute;right:5px;top:5px;display:grid;place-items:center;min-width:28px;height:28px;padding:0 5px;border-radius:999px;background:#080b10e8;border:1px solid #ffffff38;color:#fff;font-size:12px;box-shadow:0 4px 14px #0009}
+.deck-card>span{display:-webkit-box;padding:7px 2px 1px;font-size:11px;font-weight:600;line-height:1.3;min-height:38px;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.deck-card small{display:block;color:var(--muted);font-size:8px;margin-top:2px}
+.deck-card.deck-selected .deck-card-art{outline:2px solid #78d9ac;outline-offset:2px;box-shadow:0 0 22px #78d9ac38}
+.deck-card-placeholder{height:100%;display:grid;place-items:center;background:linear-gradient(145deg,#19202c,#0b0f16);color:#8190a5;font-size:25px}.deck-card-placeholder i{width:24px;height:24px;border:2px solid #ffffff20;border-top-color:#8ab8ff;border-radius:50%;animation:deck-spin .8s linear infinite}.deck-card-placeholder.failed{background:linear-gradient(145deg,#23191c,#0d0b0c)}
+@keyframes deck-spin{to{transform:rotate(360deg)}}
+.deck-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.deck-actions button{background:#233547;color:#e2f0ff;border:1px solid #42576c;border-radius:8px;padding:9px;font-size:12px}
+.deck-panel textarea{width:100%;min-height:180px;resize:vertical;background:#0b0e15;color:#d8e0ed;border:1px solid var(--line);border-radius:8px;margin-top:12px;padding:10px;font-size:11px}
+@media(max-width:1100px){.deck-card-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:11px 8px}}
+@media(max-width:780px){.deck-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}.deck-card>span{font-size:10px}}
+@media(max-width:430px){.deck-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

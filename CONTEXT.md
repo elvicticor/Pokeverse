@@ -216,7 +216,15 @@ Publicada en **GitHub Pages**: https://elvicticor.github.io/Pokeverse/ (repo: ht
 - `PRICE_RANGES` y `TCGPLAYER_VARIANTS` en `src/pricing.ts`.
 - La clave `pokeverse:index:v1` de `localStorage` en `src/api.ts`.
 
-## Posibles siguientes mejoras
+## Mazos y combinaciones (28/09/2026)
+
+El visor compartido `CardViewer` incluye `DeckRecommendations`, tanto desde la ficha como desde el mercado. El catálogo local `src/decks.ts` contiene tres listas documentadas de 60 cartas: Gardevoir ex / Munkidori y Dragapult ex / Charizard ex del NAIC Senior 2025, y Team Rocket's Mewtwo ex / Spidops de Juho Kallama, 7.º en NAIC Masters 2026. Las listas antiguas se muestran como archivo histórico y la lista 2026 conserva evento y posición; no se afirma legalidad futura ni que una lista sea universalmente “la mejor”.
+
+La asociación exacta compara identificadores TCGdex, normalizando únicamente ceros iniciales del número. El catálogo también admite alias editoriales explícitos para mostrar un **arquetipo relacionado**. Esa relación se etiqueta claramente y advierte que la carta abierta no está en las 60 cartas; por ejemplo, Rocket's Mewtwo ex de 2004 conduce al arquetipo moderno Team Rocket's Mewtwo ex / Spidops sin declarar que ambas cartas sean intercambiables. Cada lista contiene enlace de origen, estrategia y combinaciones editoriales, cantidades por categoría, resaltado de la carta abierta, copia al portapapeles, texto seleccionable y descarga .txt con códigos de expansión para TCG Live. La aceptación y legalidad final las comprueba TCG Live. No se ha verificado la importación dentro de ese cliente.
+
+El catálogo valida que cada lista sume 60 cartas. Al desplegar un mazo, cada entrada carga bajo demanda su imagen de TCGdex y presenta una galería adaptable con cantidad, nombre y expansión; una tarjeta visual de respaldo mantiene visible la cantidad si la API no dispone de imagen, como puede ocurrir con Energías básicas. El panel del visor ocupa entre 440 y 560 px en escritorio y la galería calcula automáticamente sus columnas con miniaturas de al menos 112 px; en móvil pasa a tres y luego dos columnas. Las imágenes no se solicitan mientras el mazo permanece cerrado. Para ampliar cobertura se añaden listas documentadas y sus identificadores exactos, conservando fuente y contexto temporal. No hay generación automática de recomendaciones ni se muestra un presupuesto parcial como coste total.
+
+## Pendientes
 
 - Favoritos persistentes con `localStorage`.
 - Comparador de estadísticas.
