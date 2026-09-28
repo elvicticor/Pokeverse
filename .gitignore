@@ -21,3 +21,6 @@ Thumbs.db
 .idea/
 
 # Nota: public/cards.json SÍ se versiona (lo usa /mercado y lo actualiza el workflow diario)
+
+# Notas internas de desarrollo (no se versionan)
+CONTEXT.md
